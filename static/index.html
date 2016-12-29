@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+        <meta name="description" content="">
+        <meta name="author" content="">
+        <link rel="icon" href="../../favicon.ico">
+
+        <title>My Garage Contorller</title>
+
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+        <link href="http://getbootstrap.com/examples/sticky-footer-navbar/sticky-footer-navbar.css" rel="stylesheet"/>
+        <script src="js/footer.js"></script>
+        <style type="text/css">
+            .progress {
+                height: 40px;
+                margin-top: 10px;
+            }
+            .progress-bar {
+                font-size:16px ;
+                line-height:34px;
+            }
+        </style>
+    </head>
+
+    <body>
+        <!-- Fixed navbar -->
+        <nav class="navbar navbar-default navbar-fixed-top">
+            <div class="container">
+                <div class="navbar-header">
+                    <a class="navbar-brand">My Garage</a>
+                </div>
+            </div>
+        </nav>
+
+        <div class ="container" align="center">
+            <div class="progress" >
+                <div id ="status" class="progress-bar progress-bar-striped" role="progressbar" aria-valuenow="100" style="width: 100%">
+                    Opened
+                </div>
+            </div>
+            <div id="open" class="btn btn-primary btn-lg " role="button" onclick="active()" align="center" style="width:340px; height:200px">
+                <div class="media">
+                    <div class="media-left media-middle">
+                        <img class="media-object" src="images/storm_trooper.png" style="width:135px;height:128px;"/>
+                    </div>
+                    <div class="media-body">
+                        <h1 class="media-heading" >OPEN</h1>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer class="footer">
+            <div class="container">
+                <p id="footer" class="text-muted">Last open time</p>
+            </div>
+        </footer>
+
+
+        <!-- Bootstrap core JavaScript
+            ================================================== -->
+            <!-- Placed at the end of the document so the pages load faster -->
+            <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+            <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+            <script> 
+                window.onload= function(){
+                    load_last_trigger_time();
+                    load_door_status();
+                }
+            </script>
+    </body>
+</html>
+

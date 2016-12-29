@@ -1,0 +1,8 @@
+{
+    "door":{
+        "name": "stargate",
+        "pin_state": 14,
+        "pin_relay": 18,
+        "time_to_switch": 13,
+    }
+}
