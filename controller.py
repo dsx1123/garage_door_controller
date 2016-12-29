@@ -5,77 +5,93 @@ __email__="shangxindu@gmail.com"
 
 import logging
 import time
+import json
 from logging.handlers import RotatingFileHandler
-from threading import Thread
+from threading import Timer
 
 from gpiozero import Button,OutputDevice
-from flask import Flask
-
-app = Flask(__name__, static_url_path='')
-
-switch_thread = None  
-
+from flask import Flask, g
 
 class Door():
     last_action = None
     last_trigger_time = None
-def __init__(self,  config):
-        self.name = config['name']
-        self.pin_relay = config['pin_relay']
-        self.pin_state = config['pin_state']
-        self.time_to_switch = config['time_to_switch']
-        self.switch = Button(self.pin_state)
+
+    def __init__(self,  config):
+            self.name = config['door']['name']
+            self.pin_relay = config['door']['pin_relay']
+            self.pin_state = config['door']['pin_state']
+            self.time_to_open = config['door']['time_to_open']
+            self.time_to_close = config['door']['time_to_close']
+            self.switch = Button(self.pin_state)
+            self.state = "close"
 
     def get_state(self):
-        """
-        Door state:
-        close   = 0
-        open    = 1
-        openning= 2
-        closing = 3
-        """
         if self.switch.is_pressed == 0 :
-            triggered = False
-            self.last_action = 0
-            return 0
-        elif self.last_action == 1 :
-            if time.time() - self.last_trigger_time > self.time_to_switch :
-                return 1
-            else:
-                return 2
-        elif self.last_action == 0:
-            if time.time() - self.last_trigger_time > self.time_to_switch :
-                return 1
-            else:
-                return 3
-        else:
-            return 1
+            self.state = "close"
+        return self.state
+
+    def set_state(self,state):
+        print("set state to: {}".format(state))
+        self.state = state
 
     def trigger_switch(self):
         switch = OutputDevice(self.pin_relay)
+        time.sleep(0.5)
         switch.on()
-        time.sleep(0.3)
-        switch.off()
+
         state = self.get_state()
-        if  state == 0 :
-            self.last_action = 1
-            self.last_trigger_time = time.time()
-        elif state == 1 :
-            self.last_action = 0
-            self.last_trigger_time = time.time()
-        else:
-            self.last_action = None
-            self.last_trigger_time = None
+        global switch_thread
+        if self.state == "close":
+            switch_thread= Timer(self.time_to_open, self.set_state, [ "open",])
+            switch_thread.start()
+            self.state = "openning"
+        elif self.state == "openning":
+            switch_thread.cancel()
+            self.state = "open" 
+        elif self.state == "open": 
+            switch_thread= Timer(self.time_to_close, self.set_state, ["close",])
+            switch_thread.start() 
+            self.state = "closing" 
+        elif self.state == "closing":
+            switch_thread.cancel()
+            self.state = "open"
+        return self.state
+
+def init_app():
+    app = Flask(__name__)
+    config = None
+    print("Initializing...")
+    with open('config.json','r') as f:
+        try:
+            config = json.load(f)
+        except ValueError as e:
+            app.logger.error(e)
+    with app.app_context():
+        g.garage_door = Door(config)
+    handler = RotatingFileHandler('/var/log/garage_door.log', maxBytes=10000, backupCount=1)
+    handler.setLevel(logging.DEBUG)
+    app.logger.addHandler(handler)
+    print("Initialzed...")
+    return app
+
+app = Flask(__name__)
+#app = init_app()
 
 
 
-@app.route("/door")
-def door():
-    return '<h1>Hellow There!</h1>'
+
+@app.route("/app/state")
+def get_state():
+    with app.app_context():
+        return g.garage_door.get_state()
+        
+
+@app.route("/app/trigger")
+def trigger():
+    with app.app_context():
+        state = g.garage_door.trigger_switch()
+        print(state)
+        return state
 
 if __name__ == "__main__":
-    garage_door = Door()
-    handler = RotatingFileHandler('garage_door.log', maxBytes=10000, backupCount=1)
-    handler.setLevel(logging.INFO)
-    app.logger.addHandler(handler)
     app.run()
