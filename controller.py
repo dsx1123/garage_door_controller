@@ -25,6 +25,7 @@ class Door():
             self.time_to_open = config['door']['time_to_open']
             self.time_to_close = config['door']['time_to_close']
             self.switch = Button(self.pin_state)
+            self.opener = OutputDevice(self.pin_relay,False,False)
             self.switch_thread =None
             self.last_trigger_time = datetime.today()
             self.state = "close"
@@ -39,9 +40,10 @@ class Door():
         self.state = state
 
     def trigger_switch(self):
-        switch = OutputDevice(self.pin_relay)
-        time.sleep(0.5)
-        switch.on()
+        print(self.opener.value)
+        self.opener.on()
+        time.sleep(3)
+        self.opener.off()
         self.last_trigger_time = datetime.today()
         state = self.get_state()
 
@@ -81,7 +83,6 @@ init_app(app)
 def get_state():
     with app.app_context():
         door= current_app.config["door"]
-        print(door)
         return door.get_state()
         
 
