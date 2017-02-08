@@ -64,7 +64,8 @@ class Door():
         return self.state
 
     def get_trigger_time(self):
-        return str(self.last_trigger_time)
+        time_format = "%Y-%m-%dT%H:%M:%S"
+        return str(self.last_trigger_time.strftime(time_format))
 
 def init_app(app):
     app.debug = True
