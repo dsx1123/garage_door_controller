@@ -1,0 +1,15 @@
+[Unit]
+Description=uWSGI to serve garage door opener
+After=network.target
+
+
+[Service]
+User=root
+Group=root
+WorkingDirectory=/opt/workspace/garage_door_controller
+ExecStart=/usr/local/bin/uwsgi --ini /opt/workspace/garage_door_controller/controller.ini --logto /var/log/garage_door.log  --catch-exceptions 
+
+
+
+[Install]
+WantedBy=multi-user.target
