@@ -1,0 +1,16 @@
+server {
+    listen 8801;
+    root /opt/workspace/garage_door_controller/static;
+    index index.html;
+    if_modified_since off;
+    location / {
+        try_files $uri $uri/ =404;
+        auth_basic           "closed site";
+        auth_basic_user_file /etc/nginx/.httppwd;
+    }
+
+    location /app {
+        include uwsgi_params;
+        uwsgi_pass unix:/opt/workspace/garage_door_controller/controller.sock;
+    }
+}
